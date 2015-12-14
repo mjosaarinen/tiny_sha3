@@ -20,5 +20,7 @@ $(BINARY):      $(OBJS)
 clean:
 		rm -rf $(DIST).tgz $(OBJS) $(BINARY) *~ 
 
-dist:           clean
-		cd ..; tar cfvz $(DIST)/$(DIST).tgz $(DIST)/*
+dist:		clean
+		cd ..; \
+		tar cfvJ $(DIST)/$(DIST)-`date -u "+%Y%m%d%H%M00"`.txz \
+			$(DIST)/*
