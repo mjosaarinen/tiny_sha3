@@ -18,7 +18,7 @@ $(BINARY):      $(OBJS)
 		$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
-		rm -rf $(DIST).tgz $(OBJS) $(BINARY) *~ 
+		rm -rf $(DIST)-*.txz $(OBJS) $(BINARY) *~ 
 
 dist:		clean
 		cd ..; \
