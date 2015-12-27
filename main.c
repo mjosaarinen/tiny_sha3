@@ -89,9 +89,64 @@ int test_sha3()
         sha3(msg, msg_len, buf, sha_len);
 
         if (memcmp(sha, buf, sha_len) != 0) {
-            fails++;
             fprintf(stderr, "[%d] SHA3-%d, len %d test FAILED.\n",
                 i, sha_len * 8, msg_len);
+            fails++;
+        }
+    }
+
+    return fails;
+}
+
+// test for SHAKE128 and SHAKE256
+
+int test_shake()
+{
+    // Test vectors have bytes 480..511 of XOF output for given inputs.
+    // From http://csrc.nist.gov/groups/ST/toolkit/examples.html#aHashing
+
+    const char *testhex[4] = {
+        // SHAKE128, message of length 0
+        "43E41B45A653F2A5C4492C1ADD544512DDA2529833462B71A41A45BE97290B6F",
+        // SHAKE256, message of length 0
+        "AB0BAE316339894304E35877B0C28A9B1FD166C796B9CC258A064A8F57E27F2A",
+        // SHAKE128, 1600-bit test pattern
+        "44C9FB359FD56AC0A9A75A743CFF6862F17D7259AB075216C0699511643B6439",
+        // SHAKE256, 1600-bit test pattern
+        "6A1A9D7846436E4DCA5728B6F760EEF0CA92BF0BE5615E96959D767197A0BEEB"
+    };
+
+    int i, j, fails;
+    sha3_ctx_t sha3;
+    uint8_t buf[32], ref[32];
+
+    fails = 0;
+
+    for (i = 0; i < 4; i++) {
+
+        if ((i & 1) == 0) {             // test each twice
+            shake128_init(&sha3);
+        } else {
+            shake256_init(&sha3);
+        }
+
+        if (i >= 2) {                   // 1600-bit test pattern
+            memset(buf, 0xA3, 20);
+            for (j = 0; j < 200; j += 20)
+                shake_update(&sha3, buf, 20);
+        }
+
+        shake_xof(&sha3);               // switch to extensible output
+
+        for (j = 0; j < 512; j += 32)   // output. discard bytes 0..479
+            shake_out(&sha3, buf, 32);
+
+        // compare to reference
+        test_readhex(ref, testhex[i], sizeof(ref));
+        if (memcmp(buf, ref, 32) != 0) {
+            fprintf(stderr, "[%d] SHAKE%d, len %d test FAILED.\n",
+                i, i & 1 ? 256 : 128, i >= 2 ? 1600 : 0);
+            fails++;
         }
     }
 
@@ -101,8 +156,9 @@ int test_sha3()
 // main
 int main(int argc, char **argv)
 {
-    if (test_sha3() == 0)
-        printf("SHA-3 Self-Test OK!\n");
+    if (test_sha3() == 0 && test_shake() == 0)
+        printf("FIPS 202 / SHA3, SHAKE128, SHAKE256 Self-Tests OK!\n");
 
     return 0;
 }
+

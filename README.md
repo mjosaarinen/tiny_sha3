@@ -1,9 +1,17 @@
 # tiny_sha3
-Very small, readable implementation of the SHA3 hash function.
-Updated 03-Sep-15:
+Very small, readable implementation of the FIPS 202 and SHA3 hash function.
+Public domain.
+
+### Updated 27-Dec-15:
+
+Added SHAKE128 and SHAKE256 code and test vectors. The code can actually do
+a XOF of arbitrary size (like "SHAKE512").
+
+
+### Updated 03-Sep-15:
 
 Made the implementation portable. The API is now pretty much the
-same that OpenSSL uses. Public domain.
+same that OpenSSL uses. 
 
 
 ### Updated 07-Aug-15:
@@ -25,7 +33,7 @@ Cheers,
 - markku
 
 
-### Original README.TXT from 2011:
+### Original README.TXT from 19-Nov-11:
 
 Hi.
 
