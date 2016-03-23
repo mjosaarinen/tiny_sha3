@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "sha3.h"
 
 // read a hex string, return byte length or -1 on error.
@@ -153,11 +154,42 @@ int test_shake()
     return fails;
 }
 
+// test speed of the comp
+
+void test_speed()
+{
+    int i;
+    uint64_t st[25], x, n;
+    clock_t bg, us;
+
+    for (i = 0; i < 25; i++)
+        st[i] = i;
+
+    bg = clock();
+    n = 0;
+    do {
+        for (i = 0; i < 100000; i++)
+            sha3_keccakf(st);
+        n += i;
+        us = clock() - bg;
+    } while (us < 3 * CLOCKS_PER_SEC);
+
+    x = 0;
+    for (i = 0; i < 25; i++)
+        x += st[i];
+
+    printf("(%016lX) %.3f Keccak-p[1600,24] / Second.\n",
+        x, (CLOCKS_PER_SEC * ((double) n)) / ((double) us));
+
+
+}
+
 // main
 int main(int argc, char **argv)
 {
     if (test_sha3() == 0 && test_shake() == 0)
         printf("FIPS 202 / SHA3, SHAKE128, SHAKE256 Self-Tests OK!\n");
+    test_speed();
 
     return 0;
 }
