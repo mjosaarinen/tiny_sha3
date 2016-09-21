@@ -179,7 +179,7 @@ void test_speed()
         x += st[i];
 
     printf("(%016lX) %.3f Keccak-p[1600,24] / Second.\n",
-        x, (CLOCKS_PER_SEC * ((double) n)) / ((double) us));
+        (unsigned long) x, (CLOCKS_PER_SEC * ((double) n)) / ((double) us));
 
 
 }
